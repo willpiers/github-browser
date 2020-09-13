@@ -1,28 +1,41 @@
 const express = require("express");
+const axios = require("axios").default;
 const app = express();
 const port = 9000;
 
-app.use(function (_req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // update to match the domain you will make the request from
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
+const cache = {};
+const cachingMiddleware = (req, res, next) => {
+  const key = req.url;
+  if (cache[key]) {
+    res.send(cache[key]);
+  } else {
+    res.sendResponse = res.send;
+    res.send = (body) => {
+      cache[key] = body;
+      res.sendResponse(body);
+    };
+    next();
+  }
+};
 
-app.get("/", (_req, res) => {
-  const githubRepos = {
-    repos: [
+app.get("/api/search", cachingMiddleware, (req, res) => {
+  const { q, language, sort, order, page } = req.query;
+  axios
+    .get(
+      `https://api.github.com/search/repositories?q=${q}+language:${language}&sort=${sort}&order=${order}&page=${page}`,
       {
-        id: 123,
-        name: "best-repo",
-        description: "seriously, the best one",
-        stars: 5,
-      },
-    ],
-  };
-  res.send(githubRepos);
+        Accept: "application/vnd.github.v3+json",
+      }
+    )
+    .then(function (response) {
+      console.log("headers", response.headers);
+      console.log("config", response.config);
+      res.send(response.data.items);
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+    });
 });
 
 app.listen(port, () => {
