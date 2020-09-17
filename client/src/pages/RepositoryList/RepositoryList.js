@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useReducer } from "react";
-import { Card, List, Avatar } from "antd";
+import { Avatar, Card, List, Pagination } from "antd";
 import { SearchForm } from "./components";
+import { Link } from "react-router-dom";
 
 const initialQuery = {
   search: "webpack",
@@ -20,23 +21,20 @@ function queryReducer(state, action) {
 }
 
 const queryBuilder = ({ search, language, sort, order, page }) => {
-  return `/api/search?q=${search}&language=${language}&sort=${sort}&order=${order}&page=${page}`;
+  return `/api/repositories?q=${search}&language=${language}&sort=${sort}&order=${order}&page=${page}`;
 };
 
 export const RepositoryList = () => {
   const [repos, setRepos] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [query, dispatch] = useReducer(queryReducer, initialQuery);
   useEffect(() => {
     const fetchRepos = async () => {
-      setIsLoading(true);
       const res = await fetch(queryBuilder(query), {
         method: "GET",
       });
 
       const repositories = await res.json();
       setRepos(repositories);
-      setIsLoading(false);
     };
 
     fetchRepos();
@@ -45,7 +43,7 @@ export const RepositoryList = () => {
   return (
     <div>
       <SearchForm updateQuery={dispatch} initialValues={initialQuery} />
-      {isLoading ? (
+      {!repos ? (
         <p>Loading repos...</p>
       ) : (
         <div>
@@ -53,31 +51,36 @@ export const RepositoryList = () => {
             grid={{ gutter: 8, column: 4 }}
             dataSource={repos}
             renderItem={(repo) => (
-              <List.Item>
-                <Card bordered={true}>
-                  <Card.Meta
-                    avatar={
-                      <Avatar
-                        src={`https://avatars.githubusercontent.com/${repo.owner.login}`}
-                      />
-                    }
-                    title={repo.full_name}
-                    description={repo.description}
-                  />
-                </Card>
-              </List.Item>
+              <Link to={`/${repo.full_name}`}>
+                <List.Item>
+                  <Card bordered={true}>
+                    <Card.Meta
+                      avatar={
+                        <Avatar
+                          size="small"
+                          src={`https://avatars.githubusercontent.com/${repo.owner.login}`}
+                        />
+                      }
+                      title={repo.full_name}
+                      description={repo.description}
+                    />
+                  </Card>
+                </List.Item>
+              </Link>
             )}
           />
-          <p
-            onClick={() =>
+          <Pagination
+            current={query.page}
+            pageSize={30}
+            showSizeChanger={false}
+            total={Infinity}
+            onChange={(page) => {
               dispatch({
                 type: "UPDATE_QUERY",
-                payload: { page: query.page + 1 },
-              })
-            }
-          >
-            next page
-          </p>
+                payload: { page },
+              });
+            }}
+          />
         </div>
       )}
     </div>

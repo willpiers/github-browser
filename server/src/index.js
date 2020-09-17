@@ -18,7 +18,7 @@ const cachingMiddleware = (req, res, next) => {
   }
 };
 
-app.get("/api/search", cachingMiddleware, (req, res) => {
+app.get("/api/repositories", cachingMiddleware, (req, res) => {
   const { q, language, sort, order, page } = req.query;
   axios
     .get(
@@ -28,9 +28,22 @@ app.get("/api/search", cachingMiddleware, (req, res) => {
       }
     )
     .then(function (response) {
-      console.log("headers", response.headers);
-      console.log("config", response.config);
       res.send(response.data.items);
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+    });
+});
+
+app.get("/api/repository/:owner/:name", cachingMiddleware, (req, res) => {
+  const { owner, name } = req.params;
+  axios
+    .get(`https://api.github.com/repos/${owner}/${name}`, {
+      Accept: "application/vnd.github.v3+json",
+    })
+    .then(function (response) {
+      res.send(response.data);
     })
     .catch(function (error) {
       // handle error
