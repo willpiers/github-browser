@@ -36,7 +36,7 @@ npm install
 npm start
 ```
 
-At this point you should be up and running. Happy browsing!
+At this point you should be up and running. visit http://localhost:3000/ and take a look. Happy browsing!
 
 ## Tests
 There are no tests at this time.
