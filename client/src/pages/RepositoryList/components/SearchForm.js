@@ -46,6 +46,7 @@ export const SearchForm = ({ updateQuery, initialValues }) => {
           }}
         />
       </Form.Item>
+
       <Form.Item name="language" label="Language">
         <Select
           value={0}
@@ -55,10 +56,15 @@ export const SearchForm = ({ updateQuery, initialValues }) => {
           }}
           onChange={setLanguage}
         >
-          <Option value="javascript">Javascript</Option>
+          <Option value="clojure">Clojure</Option>
+          <Option value="java">Java</Option>
+          <Option value="javascript">JavaScript</Option>
+          <Option value="python">Python</Option>
           <Option value="ruby">Ruby</Option>
+          <Option value="rust">Rust</Option>
         </Select>
       </Form.Item>
+
       <Form.Item name="sort" label="Sort By">
         <Select
           value={0}
@@ -72,6 +78,7 @@ export const SearchForm = ({ updateQuery, initialValues }) => {
           <Option value="score">Relevance (Score)</Option>
         </Select>
       </Form.Item>
+
       <Form.Item name="order" label="Order By">
         <Select
           value={0}
