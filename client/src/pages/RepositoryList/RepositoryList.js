@@ -45,6 +45,20 @@ export const RepositoryList = () => {
   return (
     <div>
       <SearchForm updateQuery={dispatch} initialValues={initialQuery} />
+      <Pagination
+        style={{ margin: "1rem 0" }}
+        disabled={!repos}
+        current={query.page}
+        pageSize={30}
+        showSizeChanger={false}
+        total={Infinity}
+        onChange={(page) => {
+          dispatch({
+            type: "UPDATE_QUERY",
+            payload: { page },
+          });
+        }}
+      />
       {!repos ? null : (
         <div>
           <List
@@ -68,18 +82,6 @@ export const RepositoryList = () => {
                 </List.Item>
               </Link>
             )}
-          />
-          <Pagination
-            current={query.page}
-            pageSize={30}
-            showSizeChanger={false}
-            total={Infinity}
-            onChange={(page) => {
-              dispatch({
-                type: "UPDATE_QUERY",
-                payload: { page },
-              });
-            }}
           />
         </div>
       )}

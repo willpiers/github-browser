@@ -56,6 +56,7 @@ export const SearchForm = ({ updateQuery, initialValues }) => {
           }}
           onChange={setLanguage}
         >
+          <Option value="">Any</Option>
           <Option value="clojure">Clojure</Option>
           <Option value="java">Java</Option>
           <Option value="javascript">JavaScript</Option>
