@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery } from "../../utils";
 import { Avatar, Button, Card, List } from "antd";
 import {
   StarOutlined,
@@ -11,22 +12,24 @@ import { Link, useParams } from "react-router-dom";
 export const RepositoryDetail = () => {
   const { owner, name } = useParams();
 
-  const [repo, setRepo] = useState(null);
-  useEffect(() => {
-    const fetchRepos = async () => {
-      const res = await fetch(`/api/repository/${owner}/${name}`, {
-        method: "GET",
-      });
+  const { data: repo, error } = useQuery(`/api/repository/${owner}/${name}`);
 
-      const repository = await res.json();
-      setRepo(repository);
-    };
-
-    fetchRepos();
-  }, [name, owner]);
+  if (error) {
+    return (
+      <div>
+        <Link to="/">
+          <Button style={{ marginBottom: "1rem" }}>Back</Button>
+        </Link>
+        <p>
+          The server encountered an error. Open the console to see more or try
+          again later.
+        </p>
+      </div>
+    );
+  }
 
   if (!repo) {
-    return <p>Loading repository...</p>;
+    return null;
   }
 
   const statistics = [

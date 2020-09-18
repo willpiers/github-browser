@@ -23,6 +23,7 @@ export const SearchForm = ({ updateQuery, initialValues }) => {
             language,
             sort,
             order,
+            page: 1,
           },
         });
       }}

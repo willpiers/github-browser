@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useReducer } from "react";
+import React, { useReducer } from "react";
+import { useQuery } from "../../utils";
 import { Avatar, Card, List, Pagination } from "antd";
 import { SearchForm } from "./components";
 import { Link } from "react-router-dom";
@@ -20,32 +21,31 @@ function queryReducer(state, action) {
   }
 }
 
-const queryBuilder = ({ search, language, sort, order, page }) => {
+const buildEndpoint = ({ search, language, sort, order, page }) => {
   return `/api/repositories?q=${search}&language=${language}&sort=${sort}&order=${order}&page=${page}`;
 };
 
 export const RepositoryList = () => {
-  const [repos, setRepos] = useState(null);
   const [query, dispatch] = useReducer(queryReducer, initialQuery);
-  useEffect(() => {
-    const fetchRepos = async () => {
-      const res = await fetch(queryBuilder(query), {
-        method: "GET",
-      });
 
-      const repositories = await res.json();
-      setRepos(repositories);
-    };
+  const { data: repos, error } = useQuery(buildEndpoint(query));
 
-    fetchRepos();
-  }, [query]);
+  if (error) {
+    return (
+      <div>
+        <SearchForm updateQuery={dispatch} initialValues={initialQuery} />
+        <p>
+          The server encountered an error. Open the console to see more or try
+          again later.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
       <SearchForm updateQuery={dispatch} initialValues={initialQuery} />
-      {!repos ? (
-        <p>Loading repos...</p>
-      ) : (
+      {!repos ? null : (
         <div>
           <List
             grid={{ gutter: 8, column: 4 }}
